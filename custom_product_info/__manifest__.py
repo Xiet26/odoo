@@ -19,9 +19,12 @@
     """,
     'author': 'cuongbd-ctigroup',
     'website': 'https://www.ctigroupjsc.com',
-    'depends': ['product', 'sale'],
+    'depends': ['product', 'sale', 'sales_team'],
     'data': [
+        'security/custom_product_info_security.xml',
+        'security/ir.model.access.csv',
         'views/product_template_views.xml',
+        'views/menu_views.xml',
     ],
     'installable': True,
     'application': False,

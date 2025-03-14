@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Quy tắc cho model product.manufacturer -->
+    <record id="rule_product_manufacturer_sale_manager" model="ir.rule">
+        <field name="name">All Manufacturers: Sale Manager has full access</field>
+        <field name="model_id" ref="model_product_manufacturer"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Quy tắc cho model product.warranty -->
+    <record id="rule_product_warranty_sale_manager" model="ir.rule">
+        <field name="name">All Warranties: Sale Manager has full access</field>
+        <field name="model_id" ref="model_product_warranty"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Quy tắc cho model product.origin -->
+    <record id="rule_product_origin_sale_manager" model="ir.rule">
+        <field name="name">All Origins: Sale Manager has full access</field>
+        <field name="model_id" ref="model_product_origin"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+</odoo> 

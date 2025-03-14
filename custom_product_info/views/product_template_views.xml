@@ -335,12 +335,10 @@
                         </group>
                     </group>
                     <group string="Technical Specifications">
-                        <field name="x_specifications_vi" placeholder="Enter specifications in Vietnamese"/>
-                        <field name="x_specifications_en" placeholder="Enter specifications in English"/>
+                        <field name="x_specifications" placeholder="Enter specifications"/>
                     </group>
                     <group string="Package Contents">
-                        <field name="x_package_includes_vi" placeholder="Enter package contents in Vietnamese"/>
-                        <field name="x_package_includes_en" placeholder="Enter package contents in English"/>
+                        <field name="x_package_includes" placeholder="Enter package contents"/>
                     </group>
                     <group string="Documents">
                         <field name="x_custom_document" filename="x_custom_document_filename"/>
@@ -351,7 +349,8 @@
         </field>
     </record>
 
-    <!-- Specifications Section -->
+    <!-- Xóa bỏ hoặc comment out các template website -->
+    <!-- 
     <template id="custom_x_specifications" name="Product Specifications" inherit_id="website_sale.product_attributes_simple" priority="16">
         <xpath expr="//div[@id='product_attributes_simple']" position="after">
             <div id="custom_specifications_section" class="mt16">
@@ -363,7 +362,6 @@
         </xpath>
     </template>
 
-    <!-- Package Includes Section -->
     <template id="custom_x_package_includes" name="Product Package Includes" inherit_id="website_sale.product_attributes_simple" priority="17">
         <xpath expr="//div[@id='product_attributes_simple']" position="after">
             <div id="custom_package_includes_section" class="mt16">
@@ -374,4 +372,5 @@
             </div>
         </xpath>
     </template>
+    -->
 </odoo> 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu gốc cho Custom Product Info -->
+    <menuitem id="menu_custom_product_info_root" 
+              name="Custom Product Info"
+              parent="sale.product_menu_catalog" 
+              sequence="5"
+              groups="sales_team.group_sale_manager"/>
+
+    <!-- Menu cho Product Manufacturer -->
+    <record id="action_product_manufacturer" model="ir.actions.act_window">
+        <field name="name">Manufacturers</field>
+        <field name="res_model">product.manufacturer</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_product_manufacturer" 
+              name="Manufacturers"
+              parent="menu_custom_product_info_root" 
+              action="action_product_manufacturer"
+              sequence="10"
+              groups="sales_team.group_sale_manager"/>
+
+    <!-- Menu cho Product Warranty -->
+    <record id="action_product_warranty" model="ir.actions.act_window">
+        <field name="name">Warranties</field>
+        <field name="res_model">product.warranty</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_product_warranty" 
+              name="Warranties"
+              parent="menu_custom_product_info_root" 
+              action="action_product_warranty"
+              sequence="20"
+              groups="sales_team.group_sale_manager"/>
+
+    <!-- Menu cho Product Origin -->
+    <record id="action_product_origin" model="ir.actions.act_window">
+        <field name="name">Origins</field>
+        <field name="res_model">product.origin</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_product_origin" 
+              name="Origins"
+              parent="menu_custom_product_info_root" 
+              action="action_product_origin"
+              sequence="30"
+              groups="sales_team.group_sale_manager"/>
+</odoo> 
