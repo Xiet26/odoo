@@ -17,11 +17,10 @@
         - Customs Description
         - Estimated Import Tax
     """,
-    'author': 'Your Company',
-    'website': 'https://www.yourcompany.com',
+    'author': 'cuongbd-ctigroup',
+    'website': 'https://www.ctigroupjsc.com',
     'depends': ['product', 'sale'],
     'data': [
-        'security/ir.model.access.csv',
         'views/product_template_views.xml',
     ],
     'installable': True,

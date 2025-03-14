@@ -5,7 +5,7 @@ class ProductWarranty(models.Model):
     _description = 'Product Warranty'
     _order = 'duration'
 
-    name = fields.Char(string='Warranty Name', required=True)
+    name = fields.Char(string='Warranty Name', required=True, translate=True)
     duration = fields.Integer(string='Duration (Months)', required=True)
     description = fields.Text(string='Description')
     active = fields.Boolean(default=True)

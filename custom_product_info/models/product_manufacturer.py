@@ -5,7 +5,7 @@ class ProductManufacturer(models.Model):
     _description = 'Product Manufacturer'
     _order = 'name'
 
-    name = fields.Char(string='Manufacturer Name', required=True)
+    name = fields.Char(string='Manufacturer Name', required=True, translate=True)
     code = fields.Char(string='Manufacturer Code')
     description = fields.Text(string='Description')
     active = fields.Boolean(default=True)

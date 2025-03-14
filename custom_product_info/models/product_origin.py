@@ -5,7 +5,7 @@ class ProductOrigin(models.Model):
     _description = 'Product Origin'
     _order = 'name'
 
-    name = fields.Char(string='Country Name', required=True)
+    name = fields.Char(string='Country Name', required=True, translate=True)
     code = fields.Char(string='Country Code', size=2)
     description = fields.Text(string='Description')
     active = fields.Boolean(default=True)

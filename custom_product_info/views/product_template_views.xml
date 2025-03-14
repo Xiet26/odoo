@@ -350,4 +350,28 @@
             </notebook>
         </field>
     </record>
+
+    <!-- Specifications Section -->
+    <template id="custom_x_specifications" name="Product Specifications" inherit_id="website_sale.product_attributes_simple" priority="16">
+        <xpath expr="//div[@id='product_attributes_simple']" position="after">
+            <div id="custom_specifications_section" class="mt16">
+                <h3>Technical Specifications</h3>
+                <div class="mt16">
+                    <span t-field="product.x_specifications"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Package Includes Section -->
+    <template id="custom_x_package_includes" name="Product Package Includes" inherit_id="website_sale.product_attributes_simple" priority="17">
+        <xpath expr="//div[@id='product_attributes_simple']" position="after">
+            <div id="custom_package_includes_section" class="mt16">
+                <h3>Package Includes</h3>
+                <div class="mt16">
+                    <span t-field="product.x_package_includes"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
 </odoo> 
