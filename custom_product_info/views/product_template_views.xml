@@ -305,6 +305,7 @@
                                    }"/>
                             <field name="x_model"/>
                             <field name="x_part_number"/>
+                            <field name="x_internal_code" readonly="1"/>
                             <field name="x_warranty_id"
                                    options="{
                                        'no_create_edit': false,
@@ -348,6 +349,75 @@
             </notebook>
         </field>
     </record>
+
+    <!-- Website Product Template -->
+    <template id="product_custom_specifications" inherit_id="website_sale.product">
+        <xpath expr="//div[@id='product_full_description']" position="after">
+            <div class="container mt-4">
+                <!-- Product Details Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="p-3 border rounded shadow-sm bg-light">
+                            <h4 class="text-primary mb-3">Product Details</h4>
+                            <div class="row">
+                                <div class="col-md-4 mb-2">
+                                    <strong>Manufacturer:</strong>
+                                    <p class="text-muted mb-0" t-field="product.x_manufacturer_id"/>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <strong>Model:</strong>
+                                    <p class="text-muted mb-0" t-field="product.x_model"/>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <strong>Warranty:</strong>
+                                    <p class="text-muted mb-0" t-field="product.x_warranty_id"/>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <strong>Origin:</strong>
+                                    <p class="text-muted mb-0" t-field="product.x_origin_id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Specifications and Package Includes Section -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="custom_x_specifications" class="p-3 border rounded shadow-sm bg-light">
+                            <h4 class="text-primary mb-2">Technical Specifications</h4>
+                            <p class="text-muted" t-field="product.x_specifications"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="custom_x_package_includes" class="p-3 border rounded shadow-sm bg-light">
+                            <h4 class="text-primary mb-2">Package Includes</h4>
+                            <p class="text-muted" t-field="product.x_package_includes"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Import Information Section -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="p-3 border rounded shadow-sm bg-light">
+                            <h4 class="text-primary mb-3">Import Information</h4>
+                            <div class="row">
+                                <div class="col-md-4 mb-2">
+                                    <strong>HS Code:</strong>
+                                    <p class="text-muted mb-0" t-field="product.x_custom_hs_code"/>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <strong>Customs Description:</strong>
+                                    <p class="text-muted mb-0" t-field="product.x_customs_description"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
 
     <!-- Xóa bỏ hoặc comment out các template website -->
     <!-- 

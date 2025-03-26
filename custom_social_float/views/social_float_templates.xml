@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="social_float_buttons" inherit_id="website.layout" name="Social Float Buttons">
+        <xpath expr="//footer" position="after">
+            <div class="social-float-container"/>
+        </xpath>
+    </template>
+</odoo> 

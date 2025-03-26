@@ -7,11 +7,24 @@ class ProductTemplate(models.Model):
     x_manufacturer_display = fields.Char(string='Manufacturer Display', compute='_compute_manufacturer_display', store=True)
     x_model = fields.Char(string='Model', translate=True)
     x_part_number = fields.Char(string='Part Number')
+    x_internal_code = fields.Char(string='Internal Code', compute='_compute_internal_code', store=True)
     x_warranty_id = fields.Many2one('product.warranty', string='Warranty')
     x_warranty_display = fields.Char(string='Warranty Display', compute='_compute_warranty_display', store=True)
     x_origin_id = fields.Many2one('product.origin', string='Origin')
     x_origin_display = fields.Char(string='Origin Display', compute='_compute_origin_display', store=True)
     
+    @api.depends('x_manufacturer_id', 'x_model', 'x_part_number')
+    def _compute_internal_code(self):
+        for record in self:
+            parts = []
+            if record.x_manufacturer_id and record.x_manufacturer_id.name:
+                parts.append(record.x_manufacturer_id.name)
+            if record.x_model:
+                parts.append(record.x_model)
+            if record.x_part_number:
+                parts.append(record.x_part_number)
+            record.x_internal_code = ' - '.join(parts) if parts else False
+
     @api.depends('x_manufacturer_id')
     def _compute_manufacturer_display(self):
         for record in self:

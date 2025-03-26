@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_social_float_public,social.float.public,model_social_float,,1,0,0,0
+access_social_float_admin,social.float.admin,model_social_float,base.group_system,1,1,1,1 
