@@ -303,6 +303,13 @@
                                        'form_view_ref': 'custom_product_info.view_product_manufacturer_form',
                                        'kanban_view_ref': 'custom_product_info.view_product_manufacturer_kanban'
                                    }"/>
+                            <field name="categ_id"
+                                   options="{
+                                       'no_create_edit': false,
+                                       'no_create': false,
+                                       'no_open': false,
+                                       'quick_create': true
+                                   }"/>
                             <field name="x_model"/>
                             <field name="x_part_number"/>
                             <field name="x_internal_code" readonly="1"/>
@@ -408,9 +415,21 @@
                                     <p class="text-muted mb-0" t-field="product.x_custom_hs_code"/>
                                 </div>
                                 <div class="col-md-4 mb-2">
-                                    <strong>Customs Description:</strong>
-                                    <p class="text-muted mb-0" t-field="product.x_customs_description"/>
+                                    <strong>Estimated Import Tax:</strong>
+                                    <p class="text-muted mb-0" t-field="product.x_estimated_import_tax"/>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customs Description Section -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="p-3 border rounded shadow-sm bg-light">
+                            <h4 class="text-primary mb-3">Customs Description</h4>
+                            <div class="customs-description-content">
+                                <t t-raw="product.x_customs_description"/>
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,8 @@
 from odoo import models, fields, api
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = ['product.template', 'website.seo.metadata']
+    _name = 'product.template'  # Explicitly set the model name to avoid inheritance issues
 
     x_manufacturer_id = fields.Many2one('product.manufacturer', string='Manufacturer')
     x_manufacturer_display = fields.Char(string='Manufacturer Display', compute='_compute_manufacturer_display', store=True)
@@ -49,3 +50,22 @@ class ProductTemplate(models.Model):
     x_custom_hs_code = fields.Char(string='Custom HS Code')
     x_customs_description = fields.Text(string='Customs Description', translate=True)
     x_estimated_import_tax = fields.Float(string='Estimated Import Tax (%)', digits=(5,2)) 
+    x_slug = fields.Char(string='URL Slug', compute='_compute_x_slug', store=True)
+    
+    @api.depends('name', 'seo_name')
+    def _compute_x_slug(self):
+        for record in self:
+            source_name = record.seo_name or record.name
+            if source_name:
+                # Use seo_name or name to create SEO friendly URL slug
+                slug = source_name.lower()
+                # Replace special characters and spaces with hyphens
+                slug = ''.join(c if c.isalnum() else '-' for c in slug)
+                # Remove consecutive hyphens
+                while '--' in slug:
+                    slug = slug.replace('--', '-')
+                # Remove leading/trailing hyphens
+                slug = slug.strip('-')
+                record.x_slug = slug
+            else:
+                record.x_slug = False
