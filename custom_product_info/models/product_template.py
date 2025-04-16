@@ -54,11 +54,22 @@ class ProductTemplate(models.Model):
     
     @api.depends('name', 'seo_name')
     def _compute_x_slug(self):
+        def convert_vietnamese_to_ascii(text):
+            if not text:
+                return ''
+            vietnamese = 'ạảãàáâậầấẩẫăắằặẳẵóòọõỏôộổỗồốơờớợởỡéèẻẹẽêếềệểễúùụủũưựữửừứíìịỉĩýỳỷỵỹđ'
+            vietnamese_ref = 'aaaaaaaaaaaaaaaaaoooooooooooooooooeeeeeeeeeeeuuuuuuuuuuuiiiiiyyyyyd'
+            vietnamese = vietnamese + vietnamese.upper()
+            vietnamese_ref = vietnamese_ref + vietnamese_ref.upper()
+            
+            trans_table = str.maketrans(vietnamese, vietnamese_ref)
+            return text.translate(trans_table)
+
         for record in self:
             source_name = record.seo_name or record.name
             if source_name:
-                # Use seo_name or name to create SEO friendly URL slug
-                slug = source_name.lower()
+                # Convert Vietnamese characters to ASCII
+                slug = convert_vietnamese_to_ascii(source_name.lower())
                 # Replace special characters and spaces with hyphens
                 slug = ''.join(c if c.isalnum() else '-' for c in slug)
                 # Remove consecutive hyphens
