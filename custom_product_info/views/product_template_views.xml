@@ -98,6 +98,11 @@
                         <field name="description"/>
                         <field name="active"/>
                     </group>
+                    <group string="Additional Information">
+                        <field name="logo" widget="image" class="oe_avatar"/> <!-- Hiển thị logo -->
+                        <field name="x_slug" readonly="1"/> <!-- Hiển thị slug (chỉ đọc) -->
+                        <field name="content" widget="html"/> <!-- Hiển thị nội dung HTML -->
+                    </group>
                 </sheet>
             </form>
         </field>
@@ -107,7 +112,7 @@
         <field name="name">product.manufacturer.list</field>
         <field name="model">product.manufacturer</field>
         <field name="arch" type="xml">
-            <list editable="bottom">
+            <list >
                 <field name="name"/>
                 <field name="code"/>
             </list>
