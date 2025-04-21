@@ -287,6 +287,21 @@
         </field>
     </record>
 
+    <!-- Product Category Form View -->
+    <record id="view_product_category_form_inherit" model="ir.ui.view">
+        <field name="name">product.category.form.inherit.custom.info</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <field name="parent_id" position="after">
+                <field name="x_logo" widget="image" class="oe_avatar"/>
+                <field name="x_content" widget="html"/>
+                <field name="x_is_show_in_homepage"/>
+                <field name="x_slug" readonly="1"/>
+            </field>
+        </field>
+    </record>
+
     <!-- Product Template Form View -->
     <record id="product_template_form_view_inherit" model="ir.ui.view">
         <field name="name">product.template.form.inherit.custom.info</field>
@@ -318,6 +333,7 @@
                             <field name="x_model"/>
                             <field name="x_part_number"/>
                             <field name="x_internal_code" readonly="1"/>
+                            <field name="x_always_available"/>
                             <field name="x_warranty_id"
                                    options="{
                                        'no_create_edit': false,

@@ -51,6 +51,7 @@ class ProductTemplate(models.Model):
     x_customs_description = fields.Text(string='Customs Description', translate=True)
     x_estimated_import_tax = fields.Float(string='Estimated Import Tax (%)', digits=(5,2)) 
     x_slug = fields.Char(string='URL Slug', compute='_compute_x_slug', store=True)
+    x_always_available = fields.Boolean(string='Always Available', default=True)
     
     @api.depends('name', 'seo_name')
     def _compute_x_slug(self):
