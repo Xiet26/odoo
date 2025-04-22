@@ -13,6 +13,13 @@ class ProductTemplate(models.Model):
     x_warranty_display = fields.Char(string='Warranty Display', compute='_compute_warranty_display', store=True)
     x_origin_id = fields.Many2one('product.origin', string='Origin')
     x_origin_display = fields.Char(string='Origin Display', compute='_compute_origin_display', store=True)
+    blog_new_tag = fields.Many2many(
+        'blog.tag',
+        'product_blog_tag_rel',
+        'product_id',
+        'blog_tag_id',
+        string='Blog Tags'
+    )
     
     @api.depends('x_manufacturer_id', 'x_model', 'x_part_number')
     def _compute_internal_code(self):
