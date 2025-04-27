@@ -59,6 +59,14 @@ class ProductTemplate(models.Model):
     x_estimated_import_tax = fields.Float(string='Estimated Import Tax (%)', digits=(5,2)) 
     x_slug = fields.Char(string='URL Slug', compute='_compute_x_slug', store=True)
     x_always_available = fields.Boolean(string='Always Available', default=True)
+
+    blog_post_ids = fields.Many2many(
+        'blog.post',
+        'blog_post_product_rel',
+        'product_id',
+        'blog_post_id',
+        string='Blog Posts'
+    )
     
     @api.depends('name', 'seo_name')
     def _compute_x_slug(self):

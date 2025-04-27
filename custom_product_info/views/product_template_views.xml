@@ -298,6 +298,7 @@
                 <field name="x_content" widget="html"/>
                 <field name="x_is_show_in_homepage"/>
                 <field name="x_slug" readonly="1"/>
+                <field name="blog_post_ids" widget="many2many_tags"/>
             </field>
         </field>
     </record>
@@ -335,6 +336,7 @@
                             <field name="x_internal_code" readonly="1"/>
                             <field name="x_always_available"/>
                             <field name="blog_new_tag" widget="many2many_tags"/>
+                            <field name="blog_post_ids" widget="many2many_tags"/>
                             <field name="x_warranty_id"
                                    options="{
                                        'no_create_edit': false,

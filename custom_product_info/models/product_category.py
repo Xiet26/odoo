@@ -8,6 +8,14 @@ class ProductCategory(models.Model):
     x_is_show_in_homepage = fields.Boolean(string='Show in Homepage', default=False)
     x_logo = fields.Image(string='Logo')  # Thêm trường logo
 
+    blog_post_ids = fields.Many2many(
+        'blog.post',
+        'blog_post_category_rel',
+        'category_id',
+        'blog_post_id',
+        string='Blog Posts'
+    )
+
     @api.depends('name')
     def _compute_x_slug(self):
         def convert_vietnamese_to_ascii(text):

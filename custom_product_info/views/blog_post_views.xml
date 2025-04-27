@@ -1,0 +1,13 @@
+<odoo>
+    <record id="view_blog_post_form_inherit_products_categories" model="ir.ui.view">
+        <field name="name">blog.post.form.inherit.products.categories</field>
+        <field name="model">blog.post</field>
+        <field name="inherit_id" ref="website_blog.view_blog_post_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="inside">
+                <field name="product_ids" widget="many2many_tags"/>
+                <field name="category_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+</odoo> 
