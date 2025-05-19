@@ -15,7 +15,16 @@ class ProductCategory(models.Model):
         'blog_post_id',
         string='Blog Posts'
     )
+    
+    x_product_attribute = fields.Many2many(
+        'product.attribute',
+        'product_attribute_category_rel',
+        'category_id',
+        'attribute_id',
+        string='Product Attributes'
+    )
 
+    
     @api.depends('name')
     def _compute_x_slug(self):
         def convert_vietnamese_to_ascii(text):

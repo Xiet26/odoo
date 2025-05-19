@@ -299,6 +299,7 @@
                 <field name="x_is_show_in_homepage"/>
                 <field name="x_slug" readonly="1"/>
                 <field name="blog_post_ids" widget="many2many_tags"/>
+                <field name="x_product_attribute" widget="many2many_tags"/>
             </field>
         </field>
     </record>
