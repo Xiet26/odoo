@@ -373,6 +373,12 @@
                     <group string="Package Contents">
                         <field name="x_package_includes" placeholder="Enter package contents"/>
                     </group>
+                    <group string="Order Information">
+                        <field name="x_order_information" placeholder="Enter order information"/>
+                    </group>
+                    <group string="YouTube Video">
+                        <field name="x_youtube_video_url" placeholder="Paste YouTube video URL here"/>
+                    </group>
                     <group string="Documents">
                         <field name="x_custom_document" filename="x_custom_document_filename"/>
                         <field name="x_custom_document_filename" invisible="1"/>

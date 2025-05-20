@@ -50,6 +50,8 @@ class ProductTemplate(models.Model):
 
     x_specifications = fields.Html(string='Technical Specifications', translate=True)
     x_package_includes = fields.Html(string='Package Includes', translate=True)
+    x_order_information = fields.Html(string='Order Information', translate=True)
+    x_youtube_video_url = fields.Char(string='YouTube Video URL', translate=True)
     
     x_custom_document = fields.Binary(string='Additional Documents', attachment=True)
     x_custom_document_filename = fields.Char(string='Document Filename', translate=True)
