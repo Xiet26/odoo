@@ -7,7 +7,7 @@ class ProductCategory(models.Model):
     x_slug = fields.Char(string='URL Slug', compute='_compute_x_slug', store=True)
     x_is_show_in_homepage = fields.Boolean(string='Show in Homepage', default=False)
     x_logo = fields.Image(string='Logo')  # Thêm trường logo
-
+    x_name = fields.Char(string='Name', translate=True)
     blog_post_ids = fields.Many2many(
         'blog.post',
         'blog_post_category_rel',

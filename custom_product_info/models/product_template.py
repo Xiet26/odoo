@@ -57,7 +57,7 @@ class ProductTemplate(models.Model):
     x_custom_document_filename = fields.Char(string='Document Filename', translate=True)
     
     x_custom_hs_code = fields.Char(string='Custom HS Code')
-    x_customs_description = fields.Text(string='Customs Description', translate=True)
+    x_customs_description = fields.Html(string='Customs Description', translate=True)
     x_estimated_import_tax = fields.Float(string='Estimated Import Tax (%)', digits=(5,2)) 
     x_slug = fields.Char(string='URL Slug', compute='_compute_x_slug', store=True)
     x_always_available = fields.Boolean(string='Always Available', default=True)

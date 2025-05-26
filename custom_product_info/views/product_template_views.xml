@@ -300,6 +300,7 @@
                 <field name="x_slug" readonly="1"/>
                 <field name="blog_post_ids" widget="many2many_tags"/>
                 <field name="x_product_attribute" widget="many2many_tags"/>
+                <field name="x_name"/>  
             </field>
         </field>
     </record>
