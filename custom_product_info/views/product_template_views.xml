@@ -361,10 +361,10 @@
                                        'form_view_ref': 'custom_product_info.view_product_origin_form',
                                        'kanban_view_ref': 'custom_product_info.view_product_origin_kanban'
                                    }"/>
+                            <field name="x_customs_description"/>
                         </group>
                         <group string="Import Information">
                             <field name="x_custom_hs_code"/>
-                            <field name="x_customs_description"/>
                             <field name="x_estimated_import_tax"/>
                         </group>
                     </group>
