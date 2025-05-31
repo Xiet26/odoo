@@ -513,4 +513,17 @@
         </xpath>
     </template>
     -->
+
+    <record id="product_variant_easy_edit_view_inherit_custom_product_info" model="ir.ui.view">
+        <field name="name">product.product.view.form.easy.inherit.custom_product_info</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group>
+                    <field name="x_configuration_content"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
 </odoo> 
