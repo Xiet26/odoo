@@ -383,6 +383,11 @@
                     <group string="Documents">
                         <field name="x_custom_document" filename="x_custom_document_filename"/>
                         <field name="x_custom_document_filename" invisible="1"/>
+                        <field name="product_document_ids"
+                               context="{'default_res_model': 'product.template', 'default_res_id': id}"
+                               domain="[('res_model', '=', 'product.template'), ('res_id', '=', id)]"
+                               widget="one2many"
+                               string="Documents"/>
                     </group>
                     <group string="Configuration">
                         <!-- <field name="x_configuration_content" placeholder="Enter configuration content"/> -->
