@@ -531,4 +531,20 @@
             </xpath>
         </field>
     </record>
+
+    <record id="product_product_tree_view_inherit_custom_product_info" model="ir.ui.view">
+        <field name="name">product.product.list.inherit.custom_product_info</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <!-- Phải dùng list thay vì tree -->
+            <xpath expr="//list" position="attributes">
+                <attribute name="editable">bottom</attribute>
+                <attribute name="multi_edit">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='active']" position="before">
+                <field name="x_configuration_content"/>
+            </xpath>
+        </field>
+    </record>
 </odoo> 
