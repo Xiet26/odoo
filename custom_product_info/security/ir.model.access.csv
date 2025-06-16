@@ -5,3 +5,5 @@ access_product_origin_sale_manager,product.origin sale manager,model_product_ori
 access_product_manufacturer_user,product.manufacturer user,model_product_manufacturer,base.group_user,1,0,0,0
 access_product_warranty_user,product.warranty user,model_product_warranty,base.group_user,1,0,0,0
 access_product_origin_user,product.origin user,model_product_origin,base.group_user,1,0,0,0
+access_product_faq_sale_manager,product.faq sale manager,model_product_faq,sales_team.group_sale_manager,1,1,1,1
+access_product_faq_user,product.faq user,model_product_faq,base.group_user,1,0,0,0

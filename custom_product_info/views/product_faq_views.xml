@@ -1,0 +1,37 @@
+<odoo>
+    <record id="view_product_faq_form" model="ir.ui.view">
+        <field name="name">product.faq.form</field>
+        <field name="model">product.faq</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="question"/>
+                        <field name="answer"/>
+                        <field name="product_tmpl_ids" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_product_faq_tree" model="ir.ui.view">
+        <field name="name">product.faq.tree</field>
+        <field name="model">product.faq</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="question"/>
+                <field name="answer"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_product_faq" model="ir.actions.act_window">
+        <field name="name">FAQs</field>
+        <field name="res_model">product.faq</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_product_faq"
+              name="FAQs"
+              parent="menu_product_attributes"
+              action="action_product_faq"
+              sequence="10"/>
+</odoo> 

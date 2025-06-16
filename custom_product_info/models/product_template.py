@@ -98,3 +98,24 @@ class ProductTemplate(models.Model):
                 record.x_slug = slug
             else:
                 record.x_slug = False
+
+    x_faq_ids = fields.Many2many(
+        'product.faq',
+        'product_faq_product_template_rel',
+        'product_tmpl_id',
+        'faq_id',
+        string='FAQs'
+    )
+
+    def action_create_faq(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Create FAQ',
+            'res_model': 'product.faq',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_product_tmpl_ids': [(6, 0, [self.id])],
+            },
+        }
