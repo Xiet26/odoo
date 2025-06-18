@@ -405,7 +405,12 @@
                         <!-- <field name="x_configuration_content" placeholder="Enter configuration content"/> -->
                     </group>
                     <group string="FAQs">
-                        <field name="x_faq_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit': True}"/>
+                        <field name="x_faq_ids" 
+                            widget="one2many" 
+                            context="{'default_product_tmpl_ids': [(6, 0, [id])]}" 
+                            domain="[('product_tmpl_ids', 'in', [id])]" 
+                            string="FAQs"/>
+                        <button name="action_create_faq" type="object" string="Create FAQ" class="btn-primary"/>
                     </group>
                 </page>
             </notebook>
@@ -413,20 +418,6 @@
     </record>
 
     <!-- Product Product Form View: Add Configuration Content -->
-    <record id="product_product_form_view_inherit_custom_info" model="ir.ui.view">
-        <field name="name">product.product.form.inherit.custom.info</field>
-        <field name="model">product.product</field>
-        <field name="inherit_id" ref="product.product_normal_form_view"/>
-        <field name="arch" type="xml">
-            <notebook position="inside">
-                <page string="Configuration" name="custom_configuration">
-                    <group>
-                        <field name="x_configuration_content" placeholder="Enter configuration content"/>
-                    </group>
-                </page>
-            </notebook>
-        </field>
-    </record>
 
     <!-- Website Product Template -->
     <template id="product_custom_specifications" inherit_id="website_sale.product">
@@ -562,4 +553,4 @@
             </xpath>
         </field>
     </record>
-</odoo> 
+</odoo>
