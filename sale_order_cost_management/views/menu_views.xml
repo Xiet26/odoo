@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action for Payment Vouchers -->
+    <record id="action_sale_order_cost" model="ir.actions.act_window">
+                <field name="name">Quản lý Phiếu chi</field>
+        <field name="res_model">sale.order.cost</field>
+                        <field name="view_mode">list,form</field>
+        <field name="context">{'form_view_initial_mode': 'edit'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new payment voucher.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item for Payment Vouchers -->
+    <menuitem id="menu_sale_order_cost"
+                            name="Quản lý Phiếu chi"
+                            parent="sale.sale_menu_root"
+              action="action_sale_order_cost"
+              sequence="10"/>
+
+</odoo>

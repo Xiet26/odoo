@@ -4,7 +4,7 @@ from odoo import models, fields, api, _
 
 class SaleOrderCost(models.Model):
     _name = 'sale.order.cost'
-    _description = 'Sale Payment Voucher'
+    _description = 'Quản lý Phiếu chi'
 
     name = fields.Char(string='Mã', required=True, readonly=True, copy=False, default='New')
     description = fields.Text(string='Nội dung')
@@ -25,3 +25,9 @@ class SaleOrderCost(models.Model):
             if vals.get('name', _('New')) == _('New'):
                 vals['name'] = self.env['ir.sequence'].next_by_code('sale.order.cost') or _('New')
         return super().create(vals_list)
+
+    def action_pay(self):
+        self.write({'state': 'paid'})
+
+    def action_reset_to_draft(self):
+        self.write({'state': 'draft'})
