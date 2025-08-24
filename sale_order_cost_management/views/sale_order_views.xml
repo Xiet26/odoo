@@ -13,6 +13,16 @@
                         <field name="total_cost"/>
                     </group>
                 </page>
+                <page string="Summary" name="order_summary">
+                    <group class="oe_subtotal_footer oe_right" name="summary_total">
+                        <field name="amount_total"/>
+                        <field name="total_cost"/>
+                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                            <label for="estimated_profit"/>
+                        </div>
+                        <field name="estimated_profit" nolabel="1" class="oe_subtotal_footer_separator"/>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
