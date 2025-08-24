@@ -9,7 +9,8 @@
  'website': '',
  'depends': ['sale_management'],
   'data': [
-                'security/ir.model.access.csv',
+                        'security/ir.model.access.csv',
+        'data/sequence_data.xml',
         'views/sale_order_cost_views.xml',
         'views/sale_order_views.xml',
     ],

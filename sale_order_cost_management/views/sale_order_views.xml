@@ -23,6 +23,9 @@
                         <field name="estimated_profit" nolabel="1" class="oe_subtotal_footer_separator"/>
                     </group>
                 </page>
+                <page string="Vị trí hàng trong kho" name="stock_location_info">
+                    <field name="stock_location_info"/>
+                </page>
             </xpath>
         </field>
     </record>
