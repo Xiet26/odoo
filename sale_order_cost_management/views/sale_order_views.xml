@@ -8,7 +8,10 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page string="Costs" name="order_costs">
-                    <field name="cost_ids"/>
+                                        <field name="cost_ids"/>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="total_cost"/>
+                    </group>
                 </page>
             </xpath>
         </field>
