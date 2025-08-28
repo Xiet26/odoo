@@ -1,6 +1,6 @@
 {
     'name': 'Sale Order Cost Management',
-    'version': '1.0.4',
+    'version': '1.0.6',
     'category': 'Sales/Sales',
     'summary': 'Manage additional costs for each sales order.',
     'description': """

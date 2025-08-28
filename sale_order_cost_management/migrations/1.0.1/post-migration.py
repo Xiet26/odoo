@@ -2,41 +2,44 @@
 
 def migrate(cr, version):
     """
-    Migration script to add missing columns to sale_order_line table
+    Migration script to add missing columns to sale_order_line and sale_order tables
     """
-    # Check if columns exist and add them if they don't
-    cr.execute("""
-        SELECT column_name 
-        FROM information_schema.columns 
-        WHERE table_name='sale_order_line' AND column_name='cost_price'
-    """)
-    
-    if not cr.fetchone():
+    # Add columns to sale_order_line table
+    columns_to_add_line = [
+        ('cost_price', 'NUMERIC'),
+        ('total_cost', 'NUMERIC'),
+        ('line_margin', 'NUMERIC')
+    ]
+
+    for column_name, column_type in columns_to_add_line:
         cr.execute("""
-            ALTER TABLE sale_order_line 
-            ADD COLUMN cost_price NUMERIC
-        """)
-    
-    cr.execute("""
-        SELECT column_name 
-        FROM information_schema.columns 
-        WHERE table_name='sale_order_line' AND column_name='total_cost'
-    """)
-    
-    if not cr.fetchone():
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_name='sale_order_line' AND column_name=%s
+        """, (column_name,))
+
+        if not cr.fetchone():
+            cr.execute(f"""
+                ALTER TABLE sale_order_line
+                ADD COLUMN {column_name} {column_type}
+            """)
+
+    # Add columns to sale_order table
+    columns_to_add_order = [
+        ('order_lines_cost', 'NUMERIC'),
+        ('total_all_costs', 'NUMERIC'),
+        ('final_profit', 'NUMERIC')
+    ]
+
+    for column_name, column_type in columns_to_add_order:
         cr.execute("""
-            ALTER TABLE sale_order_line 
-            ADD COLUMN total_cost NUMERIC
-        """)
-    
-    cr.execute("""
-        SELECT column_name 
-        FROM information_schema.columns 
-        WHERE table_name='sale_order_line' AND column_name='line_margin'
-    """)
-    
-    if not cr.fetchone():
-        cr.execute("""
-            ALTER TABLE sale_order_line 
-            ADD COLUMN line_margin NUMERIC
-        """)
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_name='sale_order' AND column_name=%s
+        """, (column_name,))
+
+        if not cr.fetchone():
+            cr.execute(f"""
+                ALTER TABLE sale_order
+                ADD COLUMN {column_name} {column_type}
+            """)

@@ -18,12 +18,17 @@
                 </page>
                 <page string="Summary" name="order_summary">
                     <group class="oe_subtotal_footer oe_right" name="summary_total">
-                        <field name="amount_total"/>
-                        <field name="total_cost"/>
-                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
-                            <label for="estimated_profit"/>
+                        <field name="amount_total" string="Total Revenue"/>
+                        <div class="oe_subtotal_footer_separator oe_inline">
+                            <span class="o_form_label">Costs Breakdown:</span>
                         </div>
-                        <field name="estimated_profit" nolabel="1" class="oe_subtotal_footer_separator"/>
+                        <field name="order_lines_cost" string="• Product Costs"/>
+                        <field name="total_cost" string="• Additional Costs"/>
+                        <field name="total_all_costs" string="Total All Costs"/>
+                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                            <label for="final_profit" string="Final Profit"/>
+                        </div>
+                        <field name="final_profit" nolabel="1" class="oe_subtotal_footer_separator"/>
                     </group>
                 </page>
                 <page string="Vị trí hàng trong kho" name="stock_location_info">

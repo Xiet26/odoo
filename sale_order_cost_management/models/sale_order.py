@@ -10,10 +10,25 @@ class SaleOrder(models.Model):
 
     estimated_profit = fields.Monetary(string='Estimated Profit', compute='_compute_estimated_profit', store=True)
 
+    # Cost from order lines
+    order_lines_cost = fields.Monetary(string='Order Lines Cost', compute='_compute_order_lines_cost', store=True)
+    total_all_costs = fields.Monetary(string='Total All Costs', compute='_compute_total_all_costs', store=True)
+    final_profit = fields.Monetary(string='Final Profit', compute='_compute_final_profit', store=True)
+
     @api.depends('cost_ids.amount')
     def _compute_total_cost(self):
         for order in self:
             order.total_cost = sum(order.cost_ids.mapped('amount'))
+
+    @api.depends('order_line.total_cost')
+    def _compute_order_lines_cost(self):
+        for order in self:
+            order.order_lines_cost = sum(order.order_line.mapped('total_cost'))
+
+    @api.depends('total_cost', 'order_lines_cost')
+    def _compute_total_all_costs(self):
+        for order in self:
+            order.total_all_costs = order.total_cost + order.order_lines_cost
 
     stock_location_info = fields.Html(string='Stock Location Info', compute='_compute_stock_location_info')
 
@@ -21,6 +36,11 @@ class SaleOrder(models.Model):
     def _compute_estimated_profit(self):
         for order in self:
             order.estimated_profit = order.amount_total - order.total_cost
+
+    @api.depends('amount_total', 'total_all_costs')
+    def _compute_final_profit(self):
+        for order in self:
+            order.final_profit = order.amount_total - order.total_all_costs
 
     @api.depends('order_line.product_id', 'warehouse_id')
     def _compute_stock_location_info(self):
