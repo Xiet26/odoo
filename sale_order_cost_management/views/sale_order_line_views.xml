@@ -15,6 +15,7 @@
                 <field name="total_cost" string="Total Cost"/>
                 <field name="price_subtotal" string="Subtotal"/>
                 <field name="line_margin" string="Margin"/>
+                <field name="product_warranty" string="Warranty"/>
             </list>
         </field>
     </record>
@@ -44,6 +45,7 @@
                 <field name="cost_price" string="Cost Price"/>
                 <field name="total_cost" string="Total Cost"/>
                 <field name="line_margin" string="Margin"/>
+                <field name="product_warranty" string="Warranty"/>
             </xpath>
         </field>
     </record>

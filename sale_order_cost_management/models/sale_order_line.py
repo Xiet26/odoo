@@ -30,6 +30,14 @@ class SaleOrderLine(models.Model):
         readonly=True
     )
 
+    # Warranty information from product
+    product_warranty = fields.Char(
+        string='Warranty',
+        compute='_compute_product_warranty',
+        store=True,
+        readonly=True
+    )
+
     @api.depends('product_id')
     def _compute_cost_price(self):
         for line in self:
@@ -47,3 +55,12 @@ class SaleOrderLine(models.Model):
     def _compute_line_margin(self):
         for line in self:
             line.line_margin = line.price_subtotal - line.total_cost
+
+    @api.depends('product_id', 'product_id.x_warranty_id', 'product_id.x_warranty_id.name', 'product_id.x_warranty_id.duration')
+    def _compute_product_warranty(self):
+        for line in self:
+            if line.product_id and line.product_id.x_warranty_id:
+                warranty = line.product_id.x_warranty_id
+                line.product_warranty = f"{warranty.name} ({warranty.duration} months)"
+            else:
+                line.product_warranty = "No warranty"

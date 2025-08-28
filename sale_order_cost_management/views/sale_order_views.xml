@@ -37,4 +37,16 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Inherit Sale Order Form View to add warranty column to order lines -->
+    <record id="view_order_form_inherit_warranty" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.warranty</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']//list//field[@name='price_subtotal']" position="after">
+                <field name="product_warranty" string="Warranty" optional="show"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

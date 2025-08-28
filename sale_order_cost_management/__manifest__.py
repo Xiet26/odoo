@@ -1,6 +1,6 @@
 {
     'name': 'Sale Order Cost Management',
-    'version': '1.0.6',
+    'version': '1.0.9',
     'category': 'Sales/Sales',
     'summary': 'Manage additional costs for each sales order.',
     'description': """
@@ -8,7 +8,7 @@
     """,
     'author': 'Cascade (AI Assistant)',
     'website': '',
-    'depends': ['sale_management'],
+    'depends': ['sale_management', 'custom_product_info'],
     'data': [
         'security/ir.model.access.csv',
         'data/sequence_data.xml',
