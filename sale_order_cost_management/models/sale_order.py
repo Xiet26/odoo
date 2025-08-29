@@ -15,6 +15,13 @@ class SaleOrder(models.Model):
     total_all_costs = fields.Monetary(string='Total All Costs', compute='_compute_total_all_costs', store=True)
     final_profit = fields.Monetary(string='Final Profit', compute='_compute_final_profit', store=True)
 
+    # Commercial terms
+    commercial_terms = fields.Html(
+        string='Điều khoản thương mại',
+        help='Các điều khoản và điều kiện thương mại cho đơn hàng này',
+        default=lambda self: self._get_default_commercial_terms()
+    )
+
     @api.depends('cost_ids.amount')
     def _compute_total_cost(self):
         for order in self:
@@ -86,11 +93,56 @@ class SaleOrder(models.Model):
             html += '</tbody></table>'
             order.stock_location_info = html
 
+    def _get_default_commercial_terms(self):
+        """Get default commercial terms content"""
+        return """
+        <h3>ĐIỀU KHOẢN THƯƠNG MẠI</h3>
+
+        <h4>1. ĐIỀU KIỆN THANH TOÁN</h4>
+        <ul>
+            <li><strong>Phương thức thanh toán:</strong> Chuyển khoản ngân hàng</li>
+            <li><strong>Thời hạn thanh toán:</strong> 30 ngày kể từ ngày xuất hóa đơn</li>
+            <li><strong>Tạm ứng:</strong> 50% giá trị đơn hàng trước khi sản xuất</li>
+        </ul>
+
+        <h4>2. ĐIỀU KIỆN GIAO HÀNG</h4>
+        <ul>
+            <li><strong>Thời gian giao hàng:</strong> 15-20 ngày làm việc kể từ khi nhận đặt cọc</li>
+            <li><strong>Địa điểm giao hàng:</strong> Theo địa chỉ khách hàng cung cấp</li>
+            <li><strong>Phí vận chuyển:</strong> Miễn phí trong nội thành, tính phí cho các tỉnh khác</li>
+        </ul>
+
+        <h4>3. BẢO HÀNH & HỖ TRỢ</h4>
+        <ul>
+            <li><strong>Thời gian bảo hành:</strong> 12 tháng kể từ ngày giao hàng</li>
+            <li><strong>Phạm vi bảo hành:</strong> Lỗi do nhà sản xuất, không bao gồm hư hỏng do sử dụng sai cách</li>
+            <li><strong>Hỗ trợ kỹ thuật:</strong> 24/7 qua hotline và email</li>
+        </ul>
+
+        <h4>4. ĐIỀU KHOẢN KHÁC</h4>
+        <ul>
+            <li><strong>Hủy đơn hàng:</strong> Phải thông báo trước 48h, có thể áp dụng phí hủy</li>
+            <li><strong>Thay đổi đơn hàng:</strong> Chỉ được phép trước khi bắt đầu sản xuất</li>
+            <li><strong>Tranh chấp:</strong> Được giải quyết thông qua thương lượng, hòa giải</li>
+        </ul>
+
+        <p><em>Điều khoản này có hiệu lực kể từ ngày ký hợp đồng và có thể được điều chỉnh theo thỏa thuận của hai bên.</em></p>
+        """
+
     def action_export_xlsx(self):
         """Export sale order to Excel file"""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_url',
             'url': f'/sale_order/export_xlsx/{self.id}',
+            'target': 'self',
+        }
+
+    def action_export_warranty_docx(self):
+        """Export warranty document to Word file"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/sale_order/export_warranty_docx/{self.id}',
             'target': 'self',
         }

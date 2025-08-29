@@ -1,0 +1,7 @@
+# Python dependencies for Sale Order Cost Management module
+
+# Required for Excel export functionality
+xlsxwriter>=1.0.0
+
+# Required for Word document export functionality
+python-docx>=0.8.11

@@ -32,14 +32,30 @@ Module **Sale Order Cost Management** cho phép quản lý chi phí và tính to
 - Hiển thị vị trí hàng trong kho cho từng sản phẩm
 - Tự động cập nhật theo warehouse của Sale Order
 
-### 6. 📊 Export Excel
+### 6. 📋 Điều khoản thương mại
+- **Rich text editor**: Soạn thảo điều khoản với HTML editor
+- **Template mẫu**: Tự động tạo nội dung mẫu cho đơn hàng mới
+- **Tùy chỉnh linh hoạt**: Có thể chỉnh sửa cho từng đơn hàng
+- **Nội dung đầy đủ**: Thanh toán, giao hàng, bảo hành, điều khoản khác
+
+### 7. 📊 Export Excel
 - **One-click export**: Button "Export to Excel" trên Sale Order form
-- **Multi-sheet Excel**: 3 sheets với thông tin chi tiết
+- **Multi-sheet Excel**: 4 sheets với thông tin chi tiết
   - **Order Summary**: Thông tin đơn hàng, tổng hợp tài chính, thống kê
   - **Order Lines**: Chi tiết từng line với cost, margin, warranty
   - **Additional Costs**: Breakdown chi phí bổ sung
+  - **Commercial Terms**: Điều khoản thương mại đầy đủ
 - **Professional formatting**: Colors, borders, currency formatting
 - **Smart styling**: Profit/loss color coding, auto-fit columns
+
+### 8. 📄 Export Phiếu Bảo Hành (Word)
+- **One-click export**: Button "Warranty Document" trên Sale Order form
+- **Smart format detection**: Tự động chọn .docx (nếu có python-docx) hoặc .doc (HTML format)
+- **Professional document**: Format chuẩn phiếu bảo hành
+- **Complete information**: Thông tin đơn hàng, khách hàng, sản phẩm
+- **Warranty details**: Thời gian bảo hành, điều kiện, ngày hết hạn
+- **Ready to print**: Format A4 chuẩn, có chỗ ký tên
+- **No dependencies required**: Hoạt động ngay cả khi chưa install python-docx
 
 ## Cài đặt
 
@@ -47,12 +63,18 @@ Module **Sale Order Cost Management** cho phép quản lý chi phí và tính to
 - Odoo 16.0+
 - Module `sale_management`
 - Module `custom_product_info` (cho tính năng warranty)
+- Python packages: `xlsxwriter`, `python-docx` (cho export Excel/Word)
 
 ### Các bước cài đặt
-1. Copy module vào thư mục addons
-2. Restart Odoo server
-3. Vào **Apps** → tìm "Sale Order Cost Management"
-4. Click **Install**
+1. **Install Python dependencies** (optional):
+   ```bash
+   pip install xlsxwriter python-docx
+   ```
+   *Note: Module vẫn hoạt động mà không cần python-docx (sẽ export .doc thay vì .docx)*
+2. Copy module vào thư mục addons
+3. Restart Odoo server
+4. Vào **Apps** → tìm "Sale Order Cost Management"
+5. Click **Install**
 
 ## Sử dụng
 
@@ -76,14 +98,33 @@ Module **Sale Order Cost Management** cho phép quản lý chi phí và tính to
 - **Line Margin**: Lợi nhuận từng line (Subtotal - Total Cost)
 - **Final Profit**: Lợi nhuận tổng (Revenue - All Costs)
 
-### 5. Export Excel
+### 5. Quản lý điều khoản thương mại
+1. Mở Sale Order form
+2. Chuyển sang tab **"Điều khoản thương mại"**
+3. Chỉnh sửa nội dung theo nhu cầu (có template mẫu sẵn)
+4. Lưu đơn hàng
+
+### 6. Export Excel
 1. Mở Sale Order cần export
 2. Click button **"Export to Excel"** (chỉ hiện với orders đã confirm)
 3. File Excel sẽ tự động download với tên: `SO001_Export_20240829.xlsx`
-4. Mở file để xem 3 sheets:
+4. Mở file để xem 4 sheets:
    - **Order Summary**: Tổng quan đơn hàng và tài chính
    - **Order Lines**: Chi tiết từng sản phẩm
    - **Additional Costs**: Chi phí bổ sung
+   - **Commercial Terms**: Điều khoản thương mại
+
+### 7. Export Phiếu Bảo Hành
+1. Mở Sale Order cần export
+2. Click button **"Warranty Document"** (chỉ hiện với orders đã confirm)
+3. File Word sẽ tự động download:
+   - **Có python-docx**: `Phieu_Bao_Hanh_SO001_20240829.docx` (native Word format)
+   - **Không có python-docx**: `Phieu_Bao_Hanh_SO001_20240829.doc` (HTML format, vẫn mở được bằng Word)
+4. Mở file để xem:
+   - **Thông tin đơn hàng**: Số đơn, khách hàng, ngày đặt
+   - **Danh sách sản phẩm**: Với thời gian bảo hành và ngày hết hạn
+   - **Điều kiện bảo hành**: Các điều khoản chi tiết
+   - **Chỗ ký tên**: Khách hàng và người bán
 
 ## Cấu trúc dữ liệu
 

@@ -2,12 +2,21 @@
 
 import io
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from odoo import http
 from odoo.http import request, content_disposition
 from odoo.exceptions import AccessError, UserError
 from odoo.tools.misc import xlsxwriter
+
+try:
+    from docx import Document
+    from docx.shared import Inches, Pt
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.enum.table import WD_TABLE_ALIGNMENT
+    DOCX_AVAILABLE = True
+except ImportError:
+    DOCX_AVAILABLE = False
 
 _logger = logging.getLogger(__name__)
 
@@ -55,6 +64,56 @@ class SaleOrderExportController(http.Controller):
                 'status_message': 'Internal Server Error'
             })
 
+    @http.route('/sale_order/export_warranty_docx/<int:order_id>', type='http', auth='user')
+    def export_warranty_docx(self, order_id, **kwargs):
+        """Export warranty document to Word file"""
+        try:
+            # Get sale order and check permissions
+            order = request.env['sale.order'].browse(order_id)
+            if not order.exists():
+                return request.not_found()
+
+            # Check read access
+            order.check_access_rights('read')
+            order.check_access_rule('read')
+
+            # Generate Word file (HTML format that Word can open)
+            if DOCX_AVAILABLE:
+                word_data = self._generate_warranty_document_docx(order)
+                content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                extension = '.docx'
+            else:
+                word_data = self._generate_warranty_document_html(order)
+                content_type = 'application/msword'
+                extension = '.doc'
+
+            # Prepare filename
+            filename = f"Phieu_Bao_Hanh_{order.name.replace('/', '_')}_{datetime.now().strftime('%Y%m%d')}{extension}"
+
+            # Return file response
+            return request.make_response(
+                word_data,
+                headers=[
+                    ('Content-Disposition', content_disposition(filename)),
+                    ('Content-Type', content_type),
+                    ('Content-Length', len(word_data))
+                ]
+            )
+
+        except AccessError:
+            return request.make_response(
+                "Access Denied",
+                status=403,
+                headers=[('Content-Type', 'text/plain')]
+            )
+        except Exception as e:
+            _logger.exception("Error exporting warranty document: %s", str(e))
+            return request.make_response(
+                f"Error: {str(e)}",
+                status=500,
+                headers=[('Content-Type', 'text/plain')]
+            )
+
     def _generate_excel_file(self, order):
         """Generate Excel file with multiple sheets"""
         output = io.BytesIO()
@@ -67,6 +126,7 @@ class SaleOrderExportController(http.Controller):
         self._create_order_summary_sheet(workbook, order, styles)
         self._create_order_lines_sheet(workbook, order, styles)
         self._create_additional_costs_sheet(workbook, order, styles)
+        self._create_commercial_terms_sheet(workbook, order, styles)
         
         workbook.close()
         output.seek(0)
@@ -328,3 +388,398 @@ class SaleOrderExportController(http.Controller):
             worksheet.write(row, 3, total_amount, styles['total'])
             for col in range(4, 6):
                 worksheet.write(row, col, '', styles['total'])
+
+    def _create_commercial_terms_sheet(self, workbook, order, styles):
+        """Create Commercial Terms sheet"""
+        worksheet = workbook.add_worksheet('Commercial Terms')
+
+        # Set column widths
+        worksheet.set_column('A:A', 80)
+
+        row = 0
+
+        # Title
+        worksheet.write(row, 0, f'ĐIỀU KHOẢN THƯƠNG MẠI - {order.name}', styles['title'])
+        row += 2
+
+        # Commercial terms content
+        if order.commercial_terms:
+            # Convert HTML to plain text for Excel
+            import re
+            from html import unescape
+
+            # Remove HTML tags and convert to plain text
+            text_content = re.sub('<[^<]+?>', '', order.commercial_terms)
+            text_content = unescape(text_content)
+
+            # Split by lines and write each line
+            lines = text_content.strip().split('\n')
+            for line in lines:
+                line = line.strip()
+                if line:
+                    # Check if it's a header (contains numbers like "1.", "2.", etc.)
+                    if re.match(r'^\d+\.', line) or line.isupper():
+                        worksheet.write(row, 0, line, styles['subheader'])
+                    else:
+                        worksheet.write(row, 0, line, styles['normal'])
+                    row += 1
+        else:
+            worksheet.write(row, 0, 'Chưa có điều khoản thương mại được thiết lập.', styles['normal'])
+
+        # Set row height for better readability
+        for i in range(row):
+            worksheet.set_row(i, 20)
+
+    def _generate_warranty_document_html(self, order):
+        """Generate warranty document as HTML (Word-compatible)"""
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Phiếu Bảo Hành - {order.name}</title>
+            <style>
+                body {{
+                    font-family: 'Times New Roman', serif;
+                    font-size: 12pt;
+                    line-height: 1.5;
+                    margin: 1in;
+                }}
+                .header {{
+                    text-align: center;
+                    margin-bottom: 30px;
+                }}
+                .title {{
+                    font-size: 18pt;
+                    font-weight: bold;
+                    margin-bottom: 20px;
+                }}
+                .company-info {{
+                    font-size: 11pt;
+                    margin-bottom: 20px;
+                }}
+                table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
+                }}
+                th, td {{
+                    border: 1px solid black;
+                    padding: 8px;
+                    text-align: left;
+                }}
+                th {{
+                    background-color: #f0f0f0;
+                    font-weight: bold;
+                    text-align: center;
+                }}
+                .section-title {{
+                    font-size: 14pt;
+                    font-weight: bold;
+                    text-align: center;
+                    margin: 20px 0 10px 0;
+                }}
+                .terms {{
+                    margin: 10px 0;
+                }}
+                .signature-table {{
+                    margin-top: 40px;
+                }}
+                .signature-table td {{
+                    border: none;
+                    text-align: center;
+                    padding: 20px;
+                }}
+                @media print {{
+                    body {{ margin: 0.5in; }}
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="title">PHIẾU BẢO HÀNH SẢN PHẨM</div>
+                <div class="company-info">
+                    <strong>{order.company_id.name}</strong><br>
+        """
+
+        if order.company_id.street:
+            html_content += f"Địa chỉ: {order.company_id.street}<br>"
+        if order.company_id.phone:
+            html_content += f"Điện thoại: {order.company_id.phone}<br>"
+        if order.company_id.email:
+            html_content += f"Email: {order.company_id.email}<br>"
+
+        html_content += f"""
+                </div>
+            </div>
+
+            <table>
+                <tr><td><strong>Số đơn hàng:</strong></td><td>{order.name}</td></tr>
+                <tr><td><strong>Khách hàng:</strong></td><td>{order.partner_id.name}</td></tr>
+                <tr><td><strong>Ngày đặt hàng:</strong></td><td>{order.date_order.strftime('%d/%m/%Y') if order.date_order else ''}</td></tr>
+                <tr><td><strong>Người bán:</strong></td><td>{order.user_id.name if order.user_id else ''}</td></tr>
+                <tr><td><strong>Tổng giá trị:</strong></td><td>{order.amount_total:,.0f} {order.currency_id.name}</td></tr>
+                <tr><td><strong>Ngày lập phiếu:</strong></td><td>{datetime.now().strftime('%d/%m/%Y')}</td></tr>
+            </table>
+
+            <div class="section-title">DANH SÁCH SẢN PHẨM BẢO HÀNH</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%">STT</th>
+                        <th style="width: 40%">Sản phẩm</th>
+                        <th style="width: 10%">Số lượng</th>
+                        <th style="width: 20%">Thời gian BH</th>
+                        <th style="width: 15%">Hết hạn BH</th>
+                    </tr>
+                </thead>
+                <tbody>
+        """
+
+        for idx, line in enumerate(order.order_line.filtered(lambda l: not l.display_type), 1):
+            warranty_text = line.product_warranty or 'Không có thông tin'
+
+            # Calculate warranty expiry
+            expiry_text = 'N/A'
+            if order.date_order:
+                warranty_months = 12  # Default
+                if 'month' in warranty_text.lower():
+                    try:
+                        import re
+                        months_match = re.search(r'(\d+)', warranty_text)
+                        if months_match:
+                            warranty_months = int(months_match.group(1))
+                    except:
+                        pass
+
+                expiry_date = order.date_order + timedelta(days=warranty_months * 30)
+                expiry_text = expiry_date.strftime('%d/%m/%Y')
+
+            html_content += f"""
+                    <tr>
+                        <td style="text-align: center">{idx}</td>
+                        <td>{line.product_id.name or ''}</td>
+                        <td style="text-align: center">{line.product_uom_qty:g}</td>
+                        <td style="text-align: center">{warranty_text}</td>
+                        <td style="text-align: center">{expiry_text}</td>
+                    </tr>
+            """
+
+        html_content += f"""
+                </tbody>
+            </table>
+
+            <div class="section-title">ĐIỀU KIỆN BẢO HÀNH</div>
+
+            <div class="terms">
+                <p><strong>1.</strong> Sản phẩm được bảo hành miễn phí trong thời gian quy định kể từ ngày mua.</p>
+                <p><strong>2.</strong> Bảo hành không áp dụng cho các trường hợp:</p>
+                <ul>
+                    <li>Hư hỏng do sử dụng sai cách, va đập, rơi vỡ</li>
+                    <li>Hư hỏng do thiên tai, hỏa hoạn, ngập nước</li>
+                    <li>Sản phẩm đã được sửa chữa bởi bên thứ ba</li>
+                    <li>Tem bảo hành bị rách, mờ hoặc không còn nguyên vẹn</li>
+                </ul>
+                <p><strong>3.</strong> Khi bảo hành, khách hàng cần mang theo phiếu bảo hành này.</p>
+                <p><strong>4.</strong> Thời gian bảo hành có thể kéo dài 7-15 ngày tùy theo mức độ hư hỏng.</p>
+                <p><strong>5.</strong> Công ty có quyền từ chối bảo hành nếu không đáp ứng các điều kiện trên.</p>
+            </div>
+
+            <table class="signature-table">
+                <tr>
+                    <td style="width: 50%">
+                        <strong>KHÁCH HÀNG</strong><br>
+                        <em>(Ký và ghi rõ họ tên)</em><br><br><br><br>
+                    </td>
+                    <td style="width: 50%">
+                        <strong>NGƯỜI BÁN</strong><br>
+                        <em>(Ký và ghi rõ họ tên)</em><br><br><br><br>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        """
+
+        return html_content.encode('utf-8')
+
+    def _generate_warranty_document_docx(self, order):
+        """Generate warranty document as Word file using python-docx"""
+        if not DOCX_AVAILABLE:
+            raise UserError("python-docx library is not available")
+
+        # Create new document
+        doc = Document()
+
+        # Set document margins
+        sections = doc.sections
+        for section in sections:
+            section.top_margin = Inches(1)
+            section.bottom_margin = Inches(1)
+            section.left_margin = Inches(1)
+            section.right_margin = Inches(1)
+
+        # Title
+        title = doc.add_heading('PHIẾU BẢO HÀNH SẢN PHẨM', 0)
+        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Company info
+        company_info = doc.add_paragraph()
+        company_info.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        company_run = company_info.add_run(f'{order.company_id.name}\n')
+        company_run.bold = True
+        company_run.font.size = Pt(12)
+
+        if order.company_id.street:
+            company_info.add_run(f'Địa chỉ: {order.company_id.street}\n')
+        if order.company_id.phone:
+            company_info.add_run(f'Điện thoại: {order.company_id.phone}\n')
+        if order.company_id.email:
+            company_info.add_run(f'Email: {order.company_id.email}\n')
+
+        doc.add_paragraph()  # Empty line
+
+        # Order information table
+        order_table = doc.add_table(rows=6, cols=2)
+        order_table.style = 'Table Grid'
+        order_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+        # Set column widths
+        order_table.columns[0].width = Inches(2.5)
+        order_table.columns[1].width = Inches(4)
+
+        # Fill order information
+        order_info_data = [
+            ('Số đơn hàng:', order.name),
+            ('Khách hàng:', order.partner_id.name),
+            ('Ngày đặt hàng:', order.date_order.strftime('%d/%m/%Y') if order.date_order else ''),
+            ('Người bán:', order.user_id.name if order.user_id else ''),
+            ('Tổng giá trị:', f'{order.amount_total:,.0f} {order.currency_id.name}'),
+            ('Ngày lập phiếu:', datetime.now().strftime('%d/%m/%Y'))
+        ]
+
+        for i, (label, value) in enumerate(order_info_data):
+            order_table.cell(i, 0).text = label
+            order_table.cell(i, 0).paragraphs[0].runs[0].bold = True
+            order_table.cell(i, 1).text = str(value)
+
+        doc.add_paragraph()  # Empty line
+
+        # Products table
+        products_heading = doc.add_heading('DANH SÁCH SẢN PHẨM BẢO HÀNH', level=2)
+        products_heading.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Create products table
+        products_table = doc.add_table(rows=1, cols=5)
+        products_table.style = 'Table Grid'
+        products_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+        # Set column widths
+        products_table.columns[0].width = Inches(0.5)  # STT
+        products_table.columns[1].width = Inches(3)    # Sản phẩm
+        products_table.columns[2].width = Inches(1)    # Số lượng
+        products_table.columns[3].width = Inches(1.5)  # Bảo hành
+        products_table.columns[4].width = Inches(1.5)  # Hết hạn
+
+        # Header row
+        header_cells = products_table.rows[0].cells
+        headers = ['STT', 'Sản phẩm', 'Số lượng', 'Thời gian BH', 'Hết hạn BH']
+        for i, header in enumerate(headers):
+            header_cells[i].text = header
+            header_cells[i].paragraphs[0].runs[0].bold = True
+            header_cells[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add product rows
+        for idx, line in enumerate(order.order_line.filtered(lambda l: not l.display_type), 1):
+            row_cells = products_table.add_row().cells
+            row_cells[0].text = str(idx)
+            row_cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            row_cells[1].text = line.product_id.name or ''
+            row_cells[2].text = f'{line.product_uom_qty:g}'
+            row_cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            # Warranty info
+            warranty_text = line.product_warranty or 'Không có thông tin'
+            row_cells[3].text = warranty_text
+            row_cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            # Calculate warranty expiry (assuming 12 months if no specific info)
+            if order.date_order:
+                warranty_months = 12  # Default
+                if 'month' in warranty_text.lower():
+                    try:
+                        import re
+                        months_match = re.search(r'(\d+)', warranty_text)
+                        if months_match:
+                            warranty_months = int(months_match.group(1))
+                    except:
+                        pass
+
+                expiry_date = order.date_order + timedelta(days=warranty_months * 30)
+                row_cells[4].text = expiry_date.strftime('%d/%m/%Y')
+            else:
+                row_cells[4].text = 'N/A'
+            row_cells[4].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        doc.add_paragraph()  # Empty line
+
+        # Warranty terms
+        warranty_heading = doc.add_heading('ĐIỀU KIỆN BẢO HÀNH', level=2)
+        warranty_heading.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        warranty_terms = [
+            '1. Sản phẩm được bảo hành miễn phí trong thời gian quy định kể từ ngày mua.',
+            '2. Bảo hành không áp dụng cho các trường hợp:',
+            '   - Hư hỏng do sử dụng sai cách, va đập, rơi vỡ',
+            '   - Hư hỏng do thiên tai, hỏa hoạn, ngập nước',
+            '   - Sản phẩm đã được sửa chữa bởi bên thứ ba',
+            '   - Tem bảo hành bị rách, mờ hoặc không còn nguyên vẹn',
+            '3. Khi bảo hành, khách hàng cần mang theo phiếu bảo hành này.',
+            '4. Thời gian bảo hành có thể kéo dài 7-15 ngày tùy theo mức độ hư hỏng.',
+            '5. Công ty có quyền từ chối bảo hành nếu không đáp ứng các điều kiện trên.'
+        ]
+
+        for term in warranty_terms:
+            p = doc.add_paragraph(term)
+            if term.startswith(('1.', '2.', '3.', '4.', '5.')):
+                p.style = 'List Number'
+
+        doc.add_paragraph()  # Empty line
+
+        # Signatures
+        signature_table = doc.add_table(rows=3, cols=2)
+        signature_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+        # Remove borders
+        for row in signature_table.rows:
+            for cell in row.cells:
+                cell._element.get_or_add_tcPr().append(
+                    doc._element.xpath('//w:tblBorders')[0] if doc._element.xpath('//w:tblBorders') else None
+                )
+
+        # Signature content
+        signature_table.cell(0, 0).text = 'KHÁCH HÀNG'
+        signature_table.cell(0, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        signature_table.cell(0, 0).paragraphs[0].runs[0].bold = True
+
+        signature_table.cell(0, 1).text = 'NGƯỜI BÁN'
+        signature_table.cell(0, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        signature_table.cell(0, 1).paragraphs[0].runs[0].bold = True
+
+        signature_table.cell(1, 0).text = '(Ký và ghi rõ họ tên)'
+        signature_table.cell(1, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        signature_table.cell(1, 1).text = '(Ký và ghi rõ họ tên)'
+        signature_table.cell(1, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add some space for signatures
+        signature_table.cell(2, 0).text = '\n\n\n'
+        signature_table.cell(2, 1).text = '\n\n\n'
+
+        # Save to BytesIO
+        output = io.BytesIO()
+        doc.save(output)
+        output.seek(0)
+        return output.read()

@@ -1,6 +1,6 @@
 {
     'name': 'Sale Order Cost Management',
-    'version': '1.1.0',
+    'version': '1.2.0',
     'category': 'Sales/Sales',
     'summary': 'Manage additional costs for each sales order with Excel export.',
     'description': """
@@ -8,7 +8,9 @@
         - Add and track various costs associated with a sales order
         - Calculate cost price and margins for order lines
         - Export detailed sale order data to Excel format
+        - Export warranty documents to Word format
         - Track profitability of sales with comprehensive reporting
+        - Manage commercial terms for each order
     """,
     'author': 'Cascade (AI Assistant)',
     'website': '',

@@ -34,6 +34,12 @@
                 <page string="Vị trí hàng trong kho" name="stock_location_info">
                     <field name="stock_location_info"/>
                 </page>
+                <page string="Điều khoản thương mại" name="commercial_terms">
+                    <field name="commercial_terms"
+                           widget="html"
+                           placeholder="Nhập các điều khoản thương mại cho đơn hàng này..."
+                           options="{'style-inline': true, 'collaborative': false}"/>
+                </page>
             </xpath>
         </field>
     </record>
@@ -67,6 +73,18 @@
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_text">Export</span>
                         <span class="o_stat_text">Excel</span>
+                    </div>
+                </button>
+                <button name="action_export_warranty_docx"
+                        string="Export Warranty"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-file-word-o"
+                        help="Export warranty document to Word file"
+                        invisible="state in ['draft', 'cancel']">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Warranty</span>
+                        <span class="o_stat_text">Document</span>
                     </div>
                 </button>
             </xpath>
