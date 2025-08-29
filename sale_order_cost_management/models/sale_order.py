@@ -85,3 +85,12 @@ class SaleOrder(models.Model):
                 html += f"<tr><td>{line.product_id.display_name}</td><td>{line.product_uom_qty}</td><td colspan='2'>{locations_info}</td></tr>"
             html += '</tbody></table>'
             order.stock_location_info = html
+
+    def action_export_xlsx(self):
+        """Export sale order to Excel file"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/sale_order/export_xlsx/{self.id}',
+            'target': 'self',
+        }

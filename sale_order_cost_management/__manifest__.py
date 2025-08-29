@@ -1,10 +1,14 @@
 {
     'name': 'Sale Order Cost Management',
-    'version': '1.0.9',
+    'version': '1.1.0',
     'category': 'Sales/Sales',
-    'summary': 'Manage additional costs for each sales order.',
+    'summary': 'Manage additional costs for each sales order with Excel export.',
     'description': """
-        This module allows users to add and track various costs associated with a sales order directly on the order form.
+        This module allows users to:
+        - Add and track various costs associated with a sales order
+        - Calculate cost price and margins for order lines
+        - Export detailed sale order data to Excel format
+        - Track profitability of sales with comprehensive reporting
     """,
     'author': 'Cascade (AI Assistant)',
     'website': '',
