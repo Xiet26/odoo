@@ -1,6 +1,6 @@
 {
     'name': 'Sale Order Cost Management',
-    'version': '1.2.0',
+    'version': '1.2.1',
     'category': 'Sales/Sales',
     'summary': 'Manage additional costs for each sales order with Excel export.',
     'description': """

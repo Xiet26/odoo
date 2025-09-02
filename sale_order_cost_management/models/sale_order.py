@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
+from datetime import timedelta
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -146,3 +148,19 @@ class SaleOrder(models.Model):
             'url': f'/sale_order/export_warranty_docx/{self.id}',
             'target': 'self',
         }
+
+    def action_mark_as_sent(self):
+        """Mark quotation as sent without sending email"""
+        if any(order.state != 'draft' for order in self):
+            raise UserError(_("Only draft orders can be marked as sent directly."))
+
+        for order in self:
+            order.message_subscribe(partner_ids=order.partner_id.ids)
+            # Post a message to track the action
+            order.message_post(
+                body=_("Quotation marked as sent manually (without email)."),
+                message_type='notification',
+                subtype_xmlid='mail.mt_note'
+            )
+
+        self.write({'state': 'sent'})

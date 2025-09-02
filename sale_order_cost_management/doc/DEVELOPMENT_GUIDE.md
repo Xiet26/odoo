@@ -435,14 +435,17 @@ Module Sale Order Cost Management đã được phát triển thành công với
 ✅ **Hiển thị thông tin bảo hành** từ custom_product_info
 ✅ **Báo cáo tổng hợp** chi phí và lợi nhuận
 ✅ **Hiển thị vị trí hàng** trong kho
-✅ **Export Excel chuyên nghiệp** với 3 sheets chi tiết
+✅ **Export Excel chuyên nghiệp** với 4 sheets chi tiết
+✅ **Export Word phiếu bảo hành** với fallback HTML
+✅ **Mark as Sent button** không gửi email
 ✅ **Migration scripts** để đảm bảo database consistency
 ✅ **Proper view inheritance** cho Order Lines table
 ✅ **Odoo 17+ compatibility** với modern view syntax
 
-### Tính năng Excel Export (v1.1.0):
-- **One-click export** từ Sale Order form
-- **Multi-sheet Excel**: Order Summary, Order Lines, Additional Costs
+### Tính năng Export & Actions (v1.2.1):
+- **Excel Export**: Multi-sheet với Order Summary, Lines, Costs, Commercial Terms
+- **Word Export**: Phiếu bảo hành professional với smart fallback
+- **Mark as Sent**: Button đổi trạng thái không gửi email
 - **Professional formatting**: Colors, borders, currency formatting
 - **Smart styling**: Profit/loss color coding, auto-fit columns
 - **Security compliant**: Permission checks và error handling

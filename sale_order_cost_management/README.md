@@ -57,6 +57,13 @@ Module **Sale Order Cost Management** cho phép quản lý chi phí và tính to
 - **Ready to print**: Format A4 chuẩn, có chỗ ký tên
 - **No dependencies required**: Hoạt động ngay cả khi chưa install python-docx
 
+### 9. 📧 Mark as Sent (Không gửi email)
+- **Quick status change**: Button "Mark as Sent" bên cạnh "Send by Email"
+- **No email sending**: Chỉ đổi trạng thái từ Draft → Sent
+- **Same position**: Nằm ngay sau button "Send by Email" trong header
+- **Tracking**: Tự động ghi log message khi đổi trạng thái
+- **Customer subscription**: Tự động subscribe khách hàng vào order
+
 ## Cài đặt
 
 ### Yêu cầu
@@ -125,6 +132,15 @@ Module **Sale Order Cost Management** cho phép quản lý chi phí và tính to
    - **Danh sách sản phẩm**: Với thời gian bảo hành và ngày hết hạn
    - **Điều kiện bảo hành**: Các điều khoản chi tiết
    - **Chỗ ký tên**: Khách hàng và người bán
+
+### 8. Mark as Sent (Không gửi email)
+1. Mở Sale Order ở trạng thái **Draft**
+2. Trong header, bên cạnh button **"Send by Email"** sẽ có button **"Mark as Sent"**
+3. Click **"Mark as Sent"** để:
+   - Đổi trạng thái từ Draft → Sent
+   - Subscribe khách hàng vào order
+   - Ghi log message tracking
+   - **Không gửi email** (khác với "Send by Email")
 
 ## Cấu trúc dữ liệu
 

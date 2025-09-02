@@ -90,4 +90,21 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Add Mark as Sent button to Sale Order header -->
+    <record id="view_order_form_inherit_mark_sent_button" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.mark.sent.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_quotation_send'][@id='send_by_email_primary']" position="after">
+                <button name="action_mark_as_sent"
+                        string="Mark as Sent"
+                        type="object"
+                        class="btn-secondary"
+                        help="Mark quotation as sent without sending email"
+                        invisible="state != 'draft'"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
