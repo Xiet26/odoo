@@ -87,6 +87,18 @@
                         <span class="o_stat_text">Document</span>
                     </div>
                 </button>
+                <button name="action_export_quotation_docx"
+                        string="Export Quotation"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-file-word-o"
+                        help="Export quotation to Word file with complete details"
+                        invisible="state in ['draft', 'cancel']">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Quotation</span>
+                        <span class="o_stat_text">Word</span>
+                    </div>
+                </button>
             </xpath>
         </field>
     </record>

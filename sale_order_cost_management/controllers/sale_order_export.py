@@ -13,7 +13,9 @@ try:
     from docx import Document
     from docx.shared import Inches, Pt
     from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml.shared import OxmlElement, qn
     from docx.enum.table import WD_TABLE_ALIGNMENT
+    import base64
     DOCX_AVAILABLE = True
 except ImportError:
     DOCX_AVAILABLE = False
@@ -782,4 +784,343 @@ class SaleOrderExportController(http.Controller):
         output = io.BytesIO()
         doc.save(output)
         output.seek(0)
-        return output.read()
+
+        # Return the file
+        return request.make_response(
+            output.getvalue(),
+            headers=[
+                ('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+                ('Content-Disposition', content_disposition(f'Warranty_{order.name}.docx'))
+            ]
+        )
+
+    @http.route('/sale_order/export_quotation_docx/<int:order_id>', type='http', auth='user')
+    def export_quotation_docx(self, order_id, **kwargs):
+        """Export quotation to Word document with complete structure"""
+        try:
+            order = request.env['sale.order'].browse(order_id)
+            if not order.exists():
+                raise UserError("Sale order not found")
+
+            # Create Word document
+            doc = Document()
+
+            # Set document margins
+            sections = doc.sections
+            for section in sections:
+                section.top_margin = Inches(0.5)
+                section.bottom_margin = Inches(0.5)
+                section.left_margin = Inches(0.8)
+                section.right_margin = Inches(0.8)
+
+            # 1. THÔNG TIN CHUNG CỦA BÁO GIÁ
+            self._add_quotation_header(doc, order)
+
+            # 2. THÔNG TIN KHÁCH HÀNG
+            self._add_customer_info(doc, order)
+
+            # 3. THÔNG TIN CÔNG TY GỬI BÁO GIÁ
+            self._add_company_info(doc, order)
+
+            # 4. LỜI MỞ ĐẦU
+            self._add_opening_message(doc, order)
+
+            # 5. BẢNG CHI TIẾT SẢN PHẨM
+            self._add_product_table(doc, order)
+
+            # 6. TỔNG HỢP GIÁ TRỊ
+            self._add_total_summary(doc, order)
+
+            # 7. ĐIỀU KHOẢN THƯƠNG MẠI
+            self._add_commercial_terms(doc, order)
+
+            # 8. PHẦN XÁC NHẬN & CHỮ KÝ
+            self._add_signature_section(doc, order)
+
+            # Save to BytesIO
+            output = io.BytesIO()
+            doc.save(output)
+            output.seek(0)
+
+            # Return the file
+            return request.make_response(
+                output.getvalue(),
+                headers=[
+                    ('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+                    ('Content-Disposition', content_disposition(f'Quotation_{order.name}.docx'))
+                ]
+            )
+
+        except Exception as e:
+            _logger.error(f"Error exporting quotation to Word: {str(e)}")
+            return request.not_found()
+
+    def _add_quotation_header(self, doc, order):
+        """1. Thông tin chung của báo giá"""
+        # Company logo and header
+        header_table = doc.add_table(rows=2, cols=2)
+        header_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+        # Logo cell
+        logo_cell = header_table.cell(0, 0)
+        logo_p = logo_cell.paragraphs[0]
+        logo_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        logo_p.add_run("CÔNG TY TNHH IMALL VIỆT NAM").bold = True
+
+        # Quote number and date
+        info_cell = header_table.cell(0, 1)
+        info_p = info_cell.paragraphs[0]
+        info_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+        # Generate quote number
+        quote_number = f"IMV-{order.name.replace('S', '').replace('Q', '')}"
+        info_p.add_run(f"Số báo giá: {quote_number}").bold = True
+        info_p.add_run(f"\nNgày: {datetime.now().strftime('%d/%m/%Y')}")
+
+        # Title
+        title_cell = header_table.cell(1, 0)
+        title_cell.merge(header_table.cell(1, 1))
+        title_p = title_cell.paragraphs[0]
+        title_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        title_run = title_p.add_run("BẢNG BÁO GIÁ")
+        title_run.bold = True
+        title_run.font.size = Pt(16)
+
+        doc.add_paragraph()  # Add space
+
+    def _add_customer_info(self, doc, order):
+        """2. Thông tin khách hàng"""
+        customer_p = doc.add_paragraph()
+        customer_p.add_run("Kính gửi: ").bold = True
+        customer_p.add_run(order.partner_id.name or "")
+
+        if order.partner_id.vat:
+            doc.add_paragraph(f"MST: {order.partner_id.vat}")
+
+        if order.partner_id.street:
+            doc.add_paragraph(f"Địa chỉ: {order.partner_id.street}")
+
+        if order.partner_id.phone:
+            doc.add_paragraph(f"Số điện thoại: {order.partner_id.phone}")
+
+        if order.partner_id.email:
+            doc.add_paragraph(f"Email: {order.partner_id.email}")
+
+        doc.add_paragraph()  # Add space
+
+    def _add_company_info(self, doc, order):
+        """3. Thông tin công ty gửi báo giá"""
+        company_p = doc.add_paragraph()
+        company_p.add_run("Thông tin công ty:").bold = True
+
+        doc.add_paragraph("Tên công ty: CÔNG TY TNHH IMALL VIỆT NAM")
+        doc.add_paragraph("MST: 0316161476")
+        doc.add_paragraph("Địa chỉ: 52/1A Huỳnh Văn Nghệ, P. Tân Sơn, TP. HCM")
+
+        if order.user_id:
+            doc.add_paragraph(f"Nhân viên phụ trách: {order.user_id.name}")
+            if order.user_id.email:
+                doc.add_paragraph(f"Email: {order.user_id.email}")
+            if order.user_id.phone:
+                doc.add_paragraph(f"Số điện thoại: {order.user_id.phone}")
+
+        doc.add_paragraph("Website: www.imallvietnam.com")
+        doc.add_paragraph()  # Add space
+
+    def _add_opening_message(self, doc, order):
+        """4. Lời mở đầu"""
+        opening_p = doc.add_paragraph()
+        opening_text = f"""Cảm ơn Quý khách hàng đã quan tâm đến sản phẩm và dịch vụ của chúng tôi.
+Theo yêu cầu của Quý khách, chúng tôi xin gửi đến Quý khách bảng báo giá chi tiết như sau:"""
+        opening_p.add_run(opening_text)
+        doc.add_paragraph()  # Add space
+
+    def _add_product_table(self, doc, order):
+        """5. Bảng chi tiết sản phẩm/thiết bị"""
+        # Create product table
+        table = doc.add_table(rows=1, cols=7)
+        table.style = 'Table Grid'
+
+        # Header row
+        header_cells = table.rows[0].cells
+        headers = ['TT', 'Tên thiết bị', 'ĐVT', 'SL', 'Đơn giá', 'Thành tiền', 'Ghi chú']
+
+        for i, header in enumerate(headers):
+            cell = header_cells[i]
+            cell.text = header
+            # Make header bold
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.bold = True
+            cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Add product rows
+        stt = 1
+        for line in order.order_line.filtered(lambda l: not l.display_type):
+            row_cells = table.add_row().cells
+
+            # STT
+            row_cells[0].text = str(stt)
+            row_cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            # Tên thiết bị với thông tin chi tiết
+            product_info = f"{line.product_id.name}\n"
+            if hasattr(line.product_id, 'default_code') and line.product_id.default_code:
+                product_info += f"Model: {line.product_id.default_code}\n"
+            if hasattr(line.product_id, 'barcode') and line.product_id.barcode:
+                product_info += f"Part Number: {line.product_id.barcode}\n"
+            if hasattr(line.product_id, 'country_of_origin') and line.product_id.country_of_origin:
+                product_info += f"Xuất xứ: {line.product_id.country_of_origin.name}\n"
+            if hasattr(line, 'product_warranty') and line.product_warranty:
+                product_info += f"Bảo hành: {line.product_warranty}"
+
+            row_cells[1].text = product_info.strip()
+
+            # ĐVT
+            row_cells[2].text = line.product_uom.name if line.product_uom else ''
+            row_cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            # Số lượng
+            row_cells[3].text = f"{line.product_uom_qty:,.0f}"
+            row_cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+            # Đơn giá
+            row_cells[4].text = f"{line.price_unit:,.0f}"
+            row_cells[4].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+            # Thành tiền
+            row_cells[5].text = f"{line.price_subtotal:,.0f}"
+            row_cells[5].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+            # Ghi chú (delivery time, etc.)
+            note = ""
+            if hasattr(line, 'delivery_time') and line.delivery_time:
+                note = f"Giao hàng: {line.delivery_time}"
+            row_cells[6].text = note
+
+            stt += 1
+
+        doc.add_paragraph()  # Add space
+
+    def _add_total_summary(self, doc, order):
+        """6. Tổng hợp giá trị"""
+        # Create summary table
+        summary_table = doc.add_table(rows=4, cols=2)
+        summary_table.alignment = WD_TABLE_ALIGNMENT.RIGHT
+
+        # Tổng tiền trước VAT
+        summary_table.cell(0, 0).text = "Tổng tiền trước VAT:"
+        summary_table.cell(0, 1).text = f"{order.amount_untaxed:,.0f} VNĐ"
+        summary_table.cell(0, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+        # VAT
+        tax_amount = order.amount_total - order.amount_untaxed
+        summary_table.cell(1, 0).text = "VAT (10%):"
+        summary_table.cell(1, 1).text = f"{tax_amount:,.0f} VNĐ"
+        summary_table.cell(1, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+        # Tổng tiền cần thanh toán
+        summary_table.cell(2, 0).text = "Tổng tiền cần thanh toán:"
+        total_cell = summary_table.cell(2, 1)
+        total_cell.text = f"{order.amount_total:,.0f} VNĐ"
+        total_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        # Make total bold
+        for run in total_cell.paragraphs[0].runs:
+            run.bold = True
+
+        # Bằng chữ
+        summary_table.cell(3, 0).text = "Bằng chữ:"
+        amount_text = self._number_to_words(order.amount_total)
+        summary_table.cell(3, 1).text = amount_text
+
+        doc.add_paragraph()  # Add space
+
+    def _add_commercial_terms(self, doc, order):
+        """7. Điều khoản thương mại"""
+        terms_p = doc.add_paragraph()
+        terms_p.add_run("ĐIỀU KHOẢN THƯƠNG MẠI").bold = True
+        terms_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        doc.add_paragraph()
+
+        # 1. Thời gian giao hàng
+        delivery_p = doc.add_paragraph()
+        delivery_p.add_run("1. Thời gian giao hàng: ").bold = True
+        delivery_p.add_run("Theo cột ghi chú trong bảng sản phẩm.")
+
+        # 2. Phương thức thanh toán
+        payment_p = doc.add_paragraph()
+        payment_p.add_run("2. Phương thức thanh toán:").bold = True
+
+        doc.add_paragraph("   • Hàng có sẵn: thanh toán 100% trước khi giao hàng")
+        doc.add_paragraph("   • Hàng đặt: 50% khi đặt hàng, 50% trước khi giao (trong vòng 15 ngày từ ngày thông báo)")
+        doc.add_paragraph("   • Chuyển khoản ngân hàng: MB Bank - CN TP.HCM")
+        doc.add_paragraph("     STK: 0316161476001 - CÔNG TY TNHH IMALL VIỆT NAM")
+
+        # 3. Điều kiện bảo hành
+        warranty_p = doc.add_paragraph()
+        warranty_p.add_run("3. Điều kiện bảo hành: ").bold = True
+        warranty_p.add_run("Theo tiêu chuẩn nhà sản xuất, được ghi trong cột bảo hành.")
+
+        # 4. Hiệu lực báo giá
+        validity_p = doc.add_paragraph()
+        validity_p.add_run("4. Hiệu lực báo giá: ").bold = True
+        validity_p.add_run("30 ngày kể từ ngày lập báo giá (hàng tồn thay đổi mỗi ngày).")
+
+        doc.add_paragraph()
+
+    def _add_signature_section(self, doc, order):
+        """8. Phần xác nhận đặt hàng & chữ ký"""
+        # Create signature table
+        signature_table = doc.add_table(rows=4, cols=2)
+        signature_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+        # Headers
+        signature_table.cell(0, 0).text = "NGƯỜI BÁO GIÁ"
+        signature_table.cell(0, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        signature_table.cell(0, 0).paragraphs[0].runs[0].bold = True
+
+        signature_table.cell(0, 1).text = "GIÁM ĐỐC"
+        signature_table.cell(0, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        signature_table.cell(0, 1).paragraphs[0].runs[0].bold = True
+
+        # Names
+        if order.user_id:
+            signature_table.cell(1, 0).text = order.user_id.name
+        else:
+            signature_table.cell(1, 0).text = "Nhân viên kinh doanh"
+        signature_table.cell(1, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        signature_table.cell(1, 1).text = "Nguyễn Thị Minh Tâm"
+        signature_table.cell(1, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Signature spaces
+        signature_table.cell(2, 0).text = "\n\n\n(Ký tên)"
+        signature_table.cell(2, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        signature_table.cell(2, 1).text = "\n\n\n(Ký tên, đóng dấu)"
+        signature_table.cell(2, 1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # Contact info
+        contact_info = """
+Liên hệ đặt hàng:
+Địa chỉ: 52/1A Huỳnh Văn Nghệ, P. Tân Sơn, TP. HCM
+Điện thoại: (028) 3844 6789
+Email: sales@imallvietnam.com
+Website: www.imallvietnam.com"""
+
+        signature_table.cell(3, 0).merge(signature_table.cell(3, 1))
+        signature_table.cell(3, 0).text = contact_info
+        signature_table.cell(3, 0).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    def _number_to_words(self, amount):
+        """Convert number to Vietnamese words"""
+        try:
+            # Simple implementation - you can enhance this
+            if amount == 0:
+                return "Không đồng"
+
+            # For now, return a simple format
+            return f"{amount:,.0f} đồng (bằng chữ)"
+        except:
+            return "Số tiền bằng chữ"

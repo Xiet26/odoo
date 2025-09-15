@@ -149,6 +149,15 @@ class SaleOrder(models.Model):
             'target': 'self',
         }
 
+    def action_export_quotation_docx(self):
+        """Export quotation to Word file"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/sale_order/export_quotation_docx/{self.id}',
+            'target': 'self',
+        }
+
     def action_mark_as_sent(self):
         """Mark quotation as sent without sending email"""
         if any(order.state != 'draft' for order in self):
